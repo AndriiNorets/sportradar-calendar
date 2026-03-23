@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.routers import events
+
 app = FastAPI(
     title="Sportradar Sports Event Calendar",
     description="A sports event calendar API for the Sportradar Coding Academy",
@@ -17,6 +19,8 @@ app.add_middleware(
 )
 
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
+
+app.include_router(events.router)
 
 
 @app.get("/")
