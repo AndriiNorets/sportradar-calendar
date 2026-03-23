@@ -1,18 +1,5 @@
 """create initial tables
 
-
-q
-q
-esf
-q
-
-
-
-exit
-e
-q
-
-
 Revision ID: 9384f3370321
 Revises:
 Create Date: 2026-03-23 21:44:37.159050
