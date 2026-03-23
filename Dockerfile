@@ -8,14 +8,11 @@ WORKDIR /app
 # Copy dependency files first for layer caching
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies (no dev deps, no editable install)
+# Install dependencies (no dev deps, project is not a package)
 RUN uv sync --frozen --no-dev --no-install-project
 
 # Copy application code
 COPY . .
-
-# Install the project itself
-RUN uv sync --frozen --no-dev
 
 EXPOSE 8000
 
