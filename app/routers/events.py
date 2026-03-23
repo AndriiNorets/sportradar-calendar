@@ -85,9 +85,15 @@ def create_event(payload: EventCreate, db: Session = Depends(get_db)):
 
     competition = None
     if payload.competition_id:
-        competition = db.query(Competition).filter(Competition.id == payload.competition_id).first()
+        competition = (
+            db.query(Competition)
+            .filter(Competition.id == payload.competition_id)
+            .first()
+        )
         if not competition:
-            competition = Competition(id=payload.competition_id, name=payload.competition_name)
+            competition = Competition(
+                id=payload.competition_id, name=payload.competition_name
+            )
             db.add(competition)
             db.flush()
 
