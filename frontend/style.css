@@ -62,6 +62,7 @@ h1 {
   align-items: center;
 }
 
+.filters select,
 .filters input {
   padding: 0.5rem 0.75rem;
   border: 1px solid #ccc;

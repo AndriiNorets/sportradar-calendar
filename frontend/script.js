@@ -53,12 +53,30 @@ function hideError() {
   document.getElementById("error-msg").classList.add("hidden");
 }
 
+function populateSportDropdown(events) {
+  const select = document.getElementById("filter-sport");
+  const current = select.value;
+  const sports = [...new Set(events.map((e) => e.sport.name))].sort();
+
+  select.innerHTML = '<option value="">All Sports</option>';
+  sports.forEach((sport) => {
+    const opt = document.createElement("option");
+    opt.value = sport;
+    opt.textContent = sport;
+    if (sport === current) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
 async function loadEvents() {
-  const sport = document.getElementById("filter-sport").value.trim();
+  const sport = document.getElementById("filter-sport").value;
   const date = document.getElementById("filter-date").value;
   hideError();
   try {
-    const events = await fetchEvents(sport, date);
+    const allEvents = await fetchEvents("", "");
+    populateSportDropdown(allEvents);
+
+    const events = sport || date ? await fetchEvents(sport, date) : allEvents;
     renderEvents(events);
   } catch (err) {
     showError(`Failed to load events: ${err.message}`);
