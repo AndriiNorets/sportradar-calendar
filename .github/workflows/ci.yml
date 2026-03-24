@@ -36,4 +36,4 @@ jobs:
       - name: Run tests
         run: uv run pytest tests/test_events.py
         env:
-          DATABASE_URL: sqlite:///:memory:
+          DATABASE_URL: "sqlite:///:memory:"
