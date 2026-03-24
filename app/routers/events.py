@@ -31,7 +31,7 @@ def get_events(
     if date:
         query = query.filter(Event.date_venue == date)
 
-    events = query.order_by(Event.date_venue, Event.time_venue_utc).all()
+    events = query.order_by(Event.date_venue.desc(), Event.time_venue_utc.desc()).all()
     return events
 
 
