@@ -67,6 +67,43 @@ async function loadEvents() {
   }
 }
 
+document.getElementById("add-event-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const data = Object.fromEntries(new FormData(form));
+
+  const feedback = document.getElementById("form-feedback");
+  feedback.className = "form-feedback hidden";
+
+  try {
+    const resp = await fetch(`${API_BASE}/events/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        date_venue: data.date_venue,
+        time_venue_utc: data.time_venue_utc || null,
+        sport: data.sport,
+        home_team: data.home_team,
+        away_team: data.away_team,
+        description: data.description || null,
+      }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.detail || `HTTP ${resp.status}`);
+    }
+
+    form.reset();
+    feedback.textContent = "Event added!";
+    feedback.className = "form-feedback success";
+    loadEvents();
+  } catch (err) {
+    feedback.textContent = `Error: ${err.message}`;
+    feedback.className = "form-feedback error";
+  }
+});
+
 document.getElementById("btn-apply").addEventListener("click", loadEvents);
 
 document.getElementById("btn-clear").addEventListener("click", () => {

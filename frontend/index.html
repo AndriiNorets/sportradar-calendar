@@ -29,6 +29,26 @@
 
     <div id="error-msg" class="error hidden"></div>
 
+    <section class="form-section">
+      <h2>Add Event</h2>
+      <form id="add-event-form" class="event-form">
+        <div class="form-row">
+          <label>Date<input type="date" name="date_venue" required /></label>
+          <label>Time (UTC)<input type="time" name="time_venue_utc" /></label>
+          <label>Sport<input type="text" name="sport" placeholder="e.g. Football" required /></label>
+        </div>
+        <div class="form-row">
+          <label>Home Team<input type="text" name="home_team" placeholder="Home team" required /></label>
+          <label>Away Team<input type="text" name="away_team" placeholder="Away team" required /></label>
+          <label>Description<input type="text" name="description" placeholder="Optional" /></label>
+        </div>
+        <div class="form-actions">
+          <button type="submit">Add Event</button>
+          <span id="form-feedback" class="form-feedback hidden"></span>
+        </div>
+      </form>
+    </section>
+
     <table class="events-table">
       <thead>
         <tr>
