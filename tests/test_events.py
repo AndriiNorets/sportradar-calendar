@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-import app.models 
+import app.models
 from app.database import Base, get_db
 from app.main import app
 
@@ -56,7 +56,7 @@ def event_payload():
 
 def test_create_event_returns_201(client, event_payload):
     """
-    Sends a POST request with a new event. 
+    Sends a POST request with a new event.
     Checks that the server responds with status 201 Created.
     """
     response = client.post("/events/", json=event_payload)
@@ -109,8 +109,13 @@ def test_get_events_returns_created_event(client, event_payload):
 
 
 def test_get_events_uses_single_query(client, event_payload):
-    """All relationships should be eagerly loaded """
-    payload2 = {**event_payload, "home_team_name": "KAC", "away_team_name": "Capitals", "sport_name": "Ice Hockey"}
+    """All relationships should be eagerly loaded"""
+    payload2 = {
+        **event_payload,
+        "home_team_name": "KAC",
+        "away_team_name": "Capitals",
+        "sport_name": "Ice Hockey",
+    }
     client.post("/events/", json=event_payload)
     client.post("/events/", json=payload2)
     events = client.get("/events/").json()
@@ -124,7 +129,12 @@ def test_get_events_uses_single_query(client, event_payload):
 
 def test_get_events_sorted_newest_first(client, event_payload):
     older = {**event_payload, "date_venue": "2023-01-01"}
-    newer = {**event_payload, "date_venue": "2025-06-01", "home_team_name": "KAC", "away_team_name": "Capitals"}
+    newer = {
+        **event_payload,
+        "date_venue": "2025-06-01",
+        "home_team_name": "KAC",
+        "away_team_name": "Capitals",
+    }
     client.post("/events/", json=older)
     client.post("/events/", json=newer)
     events = client.get("/events/").json()
@@ -133,7 +143,12 @@ def test_get_events_sorted_newest_first(client, event_payload):
 
 
 def test_get_events_filter_by_sport(client, event_payload):
-    hockey = {**event_payload, "sport_name": "Ice Hockey", "home_team_name": "KAC", "away_team_name": "Capitals"}
+    hockey = {
+        **event_payload,
+        "sport_name": "Ice Hockey",
+        "home_team_name": "KAC",
+        "away_team_name": "Capitals",
+    }
     client.post("/events/", json=event_payload)
     client.post("/events/", json=hockey)
     events = client.get("/events/?sport=Football").json()
