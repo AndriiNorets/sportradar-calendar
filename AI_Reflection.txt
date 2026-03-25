@@ -1,0 +1,100 @@
+AI Reflection — Sportradar Coding Academy Exercise
+===================================================
+
+I used AI tools (Claude vs code extension, Antigravity) throughout this project. Below is an
+honest breakdown of where AI helped, where I had to step in myself, and what
+I learned along the way.
+
+
+What AI helped with
+-------------------
+
+Boilerplate and repetition.  Writing SQLAlchemy models, Pydantic schemas, and
+the Dockerfile was faster with AI suggestions.  The structure of these files
+is fairly standard - declare columns, set types, add relationships and the
+AI got most of it right on the first try.
+
+Test scaffolding. I described what each test should verify ("check that two
+events with the same sport reuse one row") and the AI produced the pytest code.
+I still had to review it and adjust fixtures, but the starting point saved time.
+
+CSS. I gave the AI a rough idea of the look I
+wanted (dark navbar, clean table, card-style form) and iterated from there.
+Honestly faster than writing CSS by hand for something this small.
+
+README structure.  The AI helped me organize sections (Overview, Setup, API,
+Assumptions).  I rewrote parts of it to sound like me and added the details
+that actually matter for the evaluator.
+
+
+Where I made the decisions
+--------------------------
+
+Database design.  The ERD - six tables in 3NF, the dual foreign-key approach
+for home/away teams, keeping results in a separate 1-to-1 table — that was my
+design.  I considered putting results directly in the events table but decided
+against it because not every event has a result yet (scheduled games), and
+splitting it keeps the events table cleaner.
+
+The underscore FK naming convention (_sport_id, _home_team_id) comes from the
+task requirements, but I also think it's a useful visual cue in the codebase.
+
+Query efficiency.  The task explicitly says "avoid executing SQL queries inside
+loops."  I used SQLAlchemy's joinedload() to eagerly load all relationships
+(sport, teams, venue, competition, result) in a single query.  I wrote a test
+(test_get_events_uses_single_query) to make sure the response includes all
+nested objects, which would fail if relationships were lazy-loaded and the
+session was closed.
+
+Get-or-create pattern.  When creating events via POST, the endpoint checks
+whether the sport/team already exists and creates it if not. I didn't want the user to have to create a sport first
+and then reference its ID.  The seed script uses the same pattern.
+
+Tech stack choices.  I picked FastAPI because it gives me automatic
+request validation via Pydantic and auto-generated Swagger docs.  PostgreSQL
+over SQLite because the task mentions relational databases and I wanted
+proper foreign key enforcement.  Alembic for migrations because I've worked
+with it before and it integrates well with SQLAlchemy.
+
+Frontend approach.  I briefly considered building the frontend in React but
+decided against it.  The requirements say "create an HTML page" - singular,
+simple.  React would add a build step, a Node dependency, and complexity
+that doesn't match what's being asked. JS with fetch() does the job.
+
+
+Where AI got it wrong and I had to fix it
+-----------------------------------------
+
+Schema field shadowing.  The AI generated a Pydantic schema where a field
+called "time" shadowed Python's built-in time type (from datetime import time).
+This caused a TypeError at import.  I had to rename the field to time_venue_utc
+to fix it.
+
+CI environment variable.  The tests override the database with an in-memory
+SQLite DB, but the app/database.py module creates the engine at import time
+using DATABASE_URL from .env.  In GitHub Actions there's no .env file, so the
+import crashed before any test ran.  The AI didn't catch this - I had to add
+DATABASE_URL: "sqlite:///:memory:" to the workflow env.
+
+
+What I'd do differently with more time
+---------------------------------------
+
+- Add a DELETE endpoint and the matching frontend button.
+- Add venue management (right now venues are only created through the seed
+  script, not through the form).
+- Use an async database driver (asyncpg) instead of the sync psycopg2.
+  FastAPI supports async natively and it would be more idiomatic.
+- Add pagination to GET /events/ - right now it returns everything.
+- Write more targeted tests - e.g., test the filter-by-date endpoint, test
+  edge cases like duplicate team names across different sports.
+
+
+Takeaway
+--------
+
+AI is good at generating code and definitely planning, it just does it
+faster and reasonable.  The parts that actually matter (schema design, query strategy,
+architectural decisions) still came from me.  And when the AI made mistakes,
+I needed to understand the code well enough to debug them.  Its a tool,
+not a replacement for thinking through the problem.
